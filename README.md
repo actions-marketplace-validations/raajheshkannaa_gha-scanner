@@ -147,10 +147,10 @@ Suppress specific findings with comments in your workflow files:
 
 ```yaml
 - uses: some/action@main  # gha-scanner-ignore: supply-chain/mutable-refs
-- run: echo ${{ github.event.issue.title }}  # gha-scanner-ignore
+- run: echo ${{ secrets.TOKEN }}  # gha-scanner-ignore: secrets/cli-arguments
 ```
 
-Use `# gha-scanner-ignore` to suppress all checks on that line, or `# gha-scanner-ignore: check-id` for a specific check.
+An explicit check ID is required (no blanket suppression). Suppressed findings are listed in the scan warnings for audit visibility.
 
 ## How It Works
 

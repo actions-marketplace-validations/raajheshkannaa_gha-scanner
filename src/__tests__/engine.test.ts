@@ -63,3 +63,85 @@ jobs:
     expect(result.findings.length).toBeGreaterThanOrEqual(2);
   });
 });
+
+describe('inline suppression', () => {
+  it('suppresses a finding when explicit check ID matches', () => {
+    const ctx = makeContext([makeWorkflow(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # gha-scanner-ignore: supply-chain/unpinned-actions
+`)]);
+    const result = runScan(ctx);
+    const unpinned = result.findings.filter(f => f.checkId === 'supply-chain/unpinned-actions');
+    expect(unpinned.length).toBe(0);
+    expect(result.warnings.some(w => w.includes('suppressed'))).toBe(true);
+  });
+
+  it('does NOT suppress when check ID does not match', () => {
+    const ctx = makeContext([makeWorkflow(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # gha-scanner-ignore: injection/dangerous-contexts
+`)]);
+    const result = runScan(ctx);
+    const unpinned = result.findings.filter(f => f.checkId === 'supply-chain/unpinned-actions');
+    expect(unpinned.length).toBeGreaterThan(0);
+  });
+
+  it('does NOT allow blanket suppression without check ID', () => {
+    const ctx = makeContext([makeWorkflow(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # gha-scanner-ignore
+`)]);
+    const result = runScan(ctx);
+    // Blanket ignore should NOT work, findings should remain
+    const unpinned = result.findings.filter(f => f.checkId === 'supply-chain/unpinned-actions');
+    expect(unpinned.length).toBeGreaterThan(0);
+  });
+
+  it('suppresses when comment is on the line above', () => {
+    const ctx = makeContext([makeWorkflow(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # gha-scanner-ignore: supply-chain/unpinned-actions
+      - uses: actions/checkout@v4
+`)]);
+    const result = runScan(ctx);
+    const unpinned = result.findings.filter(f => f.checkId === 'supply-chain/unpinned-actions');
+    expect(unpinned.length).toBe(0);
+  });
+
+  it('does NOT suppress when comment is two lines above', () => {
+    const ctx = makeContext([makeWorkflow(`
+name: CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # gha-scanner-ignore: supply-chain/unpinned-actions
+
+      - uses: actions/checkout@v4
+`)]);
+    const result = runScan(ctx);
+    const unpinned = result.findings.filter(f => f.checkId === 'supply-chain/unpinned-actions');
+    expect(unpinned.length).toBeGreaterThan(0);
+  });
+});

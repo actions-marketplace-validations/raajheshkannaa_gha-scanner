@@ -25,10 +25,10 @@ export function runScan(context: RepoContext): ScanResult {
     }
   }
 
-  // Filter out suppressed findings via inline comments
-  const { filtered, suppressedCount } = filterSuppressed(findings, context.workflows);
+  // Filter out suppressed findings via inline comments (requires explicit check ID)
+  const { filtered, suppressedCount, suppressedChecks } = filterSuppressed(findings, context.workflows);
   if (suppressedCount > 0) {
-    warnings.push(`${suppressedCount} finding(s) suppressed via inline comments.`);
+    warnings.push(`${suppressedCount} finding(s) suppressed via inline comments: ${suppressedChecks.join(', ')}`);
   }
 
   const { score, grade } = calculateScore(filtered, allChecks);
@@ -53,27 +53,36 @@ export function runScan(context: RepoContext): ScanResult {
   };
 }
 
-function filterSuppressed(findings: Finding[], workflows: WorkflowFile[]): { filtered: Finding[]; suppressedCount: number } {
+function filterSuppressed(findings: Finding[], workflows: WorkflowFile[]): { filtered: Finding[]; suppressedCount: number; suppressedChecks: string[] } {
   const workflowLines = new Map<string, string[]>();
   for (const wf of workflows) {
     workflowLines.set(wf.path, wf.content.split('\n'));
   }
 
-  let suppressedCount = 0;
-  const filtered = findings.filter(f => {
-    if (!f.line) return true; // Can't suppress without a line number
-    const lines = workflowLines.get(f.file);
-    if (!lines) return true;
+  // Regex requires the suppression comment to appear after YAML content (not inside a string)
+  // Matches: `  # gha-scanner-ignore: check-id` or `- uses: foo@bar # gha-scanner-ignore: check-id`
+  const SUPPRESS_RE = /\s# gha-scanner-ignore:\s*(\S+)/;
 
-    // Check the finding line and the line above for suppression comment
-    const checkLines = [lines[f.line - 1], lines[f.line - 2]].filter(Boolean);
-    for (const line of checkLines) {
-      const match = line.match(/# gha-scanner-ignore(?::?\s*(.+))?/);
+  let suppressedCount = 0;
+  const suppressedChecks: string[] = [];
+  const filtered = findings.filter(f => {
+    if (!f.line || f.line < 1) return true;
+    const lines = workflowLines.get(f.file);
+    if (!lines || f.line > lines.length) return true;
+
+    // Check the finding line and the line above
+    const linesToCheck = [lines[f.line - 1]];
+    if (f.line >= 2) linesToCheck.push(lines[f.line - 2]);
+
+    for (const line of linesToCheck) {
+      if (!line) continue;
+      const match = line.match(SUPPRESS_RE);
       if (match) {
-        const specifiedCheck = match[1]?.trim();
-        // If no specific check, suppress everything. If specific, match check ID.
-        if (!specifiedCheck || specifiedCheck === f.checkId) {
+        const specifiedCheck = match[1].trim();
+        // Must specify a check ID (no blanket suppression)
+        if (specifiedCheck === f.checkId) {
           suppressedCount++;
+          suppressedChecks.push(`${f.checkId} in ${f.file}:${f.line}`);
           return false;
         }
       }
@@ -81,7 +90,7 @@ function filterSuppressed(findings: Finding[], workflows: WorkflowFile[]): { fil
     return true;
   });
 
-  return { filtered, suppressedCount };
+  return { filtered, suppressedCount, suppressedChecks };
 }
 
 function buildCategorySummaries(findings: Finding[]): CategorySummary[] {
