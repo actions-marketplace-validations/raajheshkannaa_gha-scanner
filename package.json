@@ -2,9 +2,13 @@
   "name": "defensive.works",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "gha-scanner": "./dist/cli.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:cli": "npx esbuild src/cli.ts --bundle --platform=node --target=node18 --outfile=dist/cli.js --format=cjs --banner:js='#!/usr/bin/env node'",
     "start": "next start",
     "lint": "next lint"
   },
@@ -25,6 +29,7 @@
     "@types/pako": "^2.0.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.27.4",
     "eslint": "^8",
     "eslint-config-next": "^15.5.14",
     "postcss": "^8",
