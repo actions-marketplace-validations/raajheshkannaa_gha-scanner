@@ -123,6 +123,35 @@ curl -X POST https://scan.defensive.works/api/scan \
 
 Returns a `ScanResult` JSON object with score, grade, findings, and category breakdowns.
 
+### GitHub Action
+
+Add to your workflow to scan on every PR:
+
+```yaml
+name: Security Scan
+on: [pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: raajheshkannaa/gha-scanner@main
+        with:
+          fail-on: high  # Fail if high or critical findings (options: critical, high, medium, low, none)
+```
+
+Outputs: `score`, `grade`, `findings` count. Writes a summary table to the PR check.
+
+### Inline Suppression
+
+Suppress specific findings with comments in your workflow files:
+
+```yaml
+- uses: some/action@main  # gha-scanner-ignore: supply-chain/mutable-refs
+- run: echo ${{ github.event.issue.title }}  # gha-scanner-ignore
+```
+
+Use `# gha-scanner-ignore` to suppress all checks on that line, or `# gha-scanner-ignore: check-id` for a specific check.
+
 ## How It Works
 
 - **YAML parsing, not code execution.** The scanner reads workflow files and parses them as structured data. No workflows are triggered or executed.
