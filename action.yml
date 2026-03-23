@@ -1,5 +1,5 @@
 name: 'GHA Scanner'
-description: 'Scan GitHub Actions workflows for security vulnerabilities. 25 checks across 8 categories including supply chain, injection, permissions, secrets exposure, and more.'
+description: 'Scan GitHub Actions workflows for security vulnerabilities. 25 checks across 8 categories.'
 author: 'Raajhesh Kannaa Chidambaram'
 branding:
   icon: 'shield'
