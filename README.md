@@ -1,18 +1,32 @@
 # GHA Scanner
 
-A static analysis tool for GitHub Actions workflows. Scans repositories for security misconfigurations, injection vulnerabilities, supply chain risks, and CI/CD hygiene issues.
+Static analysis for GitHub Actions workflows. Finds security misconfigurations, injection vulnerabilities, supply chain risks, and CI/CD hygiene issues.
+
+25 checks. 8 categories. Results in seconds.
+
+## Get Started
+
+**Scan now (no install):** [scan.defensive.works](https://scan.defensive.works)
+
+**From your terminal:**
+```bash
+git clone https://github.com/raajheshkannaa/gha-scanner.git
+cd gha-scanner && npm install && npm run build:cli
+GITHUB_TOKEN=ghp_your_token node dist/cli.js your-org/your-repo
+```
+
+**Via API:**
+```bash
+curl -X POST https://scan.defensive.works/api/scan \
+  -H "Content-Type: application/json" \
+  -d '{"repo":"your-org/your-repo"}'
+```
 
 ## What It Does
 
-GHA Scanner reads your `.github/workflows/` directory and runs 25 security checks across 8 categories. It produces a scored report (A through F) with actionable remediation for every finding. No code is executed. No agents are installed. It reads YAML and tells you what is wrong.
+Reads your `.github/workflows/` YAML files and checks them against 25 security rules derived from real attacks: tj-actions (CVE-2025-30066), Trivy supply chain compromise (2026), Shai Hulud worm, GhostAction campaign.
 
-The scanner maintains a curated database of known-vulnerable actions, including the tj-actions/changed-files compromise (CVE-2025-30066), the Aqua Trivy supply chain attack (March 2026), and the Codecov bash uploader incident (CVE-2021-27027).
-
-## Live Demo
-
-**https://gha-scanner-app.vercel.app**
-
-Enter any public GitHub repository (e.g., `facebook/react`) and get a full security report in seconds.
+No code is executed. No agents are installed. It reads YAML and tells you what is wrong.
 
 ## Security Checks
 
@@ -83,41 +97,31 @@ Enter any public GitHub repository (e.g., `facebook/react`) and get a full secur
 | No Dependabot for GitHub Actions | Medium | Missing or incomplete Dependabot configuration for actions ecosystem |
 | No CODEOWNERS for Workflow Files | Low | No mandatory code review for workflow file changes |
 
-## Quick Start
+## Usage
 
-### Web UI
+### Web
 
-1. Go to [gha-scanner-app.vercel.app](https://gha-scanner-app.vercel.app)
-2. Enter a GitHub repository (e.g., `facebook/react`)
-3. Review the scored report with findings and remediation guidance
-
-### API
-
-```
-POST /api/scan
-Content-Type: application/json
-
-{
-  "repo": "owner/repo"
-}
-```
-
-Returns a full `ScanResult` JSON object with score, grade, findings, and category breakdowns.
+Go to [scan.defensive.works](https://scan.defensive.works), enter any public repo, get results.
 
 ### CLI
 
 ```bash
-# Scan a repository
-GITHUB_TOKEN=ghp_your_token npx gha-scanner facebook/react
-
-# JSON output (for CI pipelines)
-GITHUB_TOKEN=ghp_your_token npx gha-scanner owner/repo --json
-
-# Markdown output (for PRs/docs)
-GITHUB_TOKEN=ghp_your_token npx gha-scanner owner/repo --markdown
-
-# Exit codes: 0 = clean, 1 = critical/high findings, 2 = error
+GITHUB_TOKEN=ghp_xxx node dist/cli.js facebook/react           # Colored terminal output
+GITHUB_TOKEN=ghp_xxx node dist/cli.js owner/repo --json        # JSON (for CI pipelines)
+GITHUB_TOKEN=ghp_xxx node dist/cli.js owner/repo --markdown    # Markdown (for PRs/docs)
 ```
+
+Exit codes: `0` clean, `1` critical/high findings found, `2` error.
+
+### API
+
+```bash
+curl -X POST https://scan.defensive.works/api/scan \
+  -H "Content-Type: application/json" \
+  -d '{"repo":"owner/repo"}'
+```
+
+Returns a `ScanResult` JSON object with score, grade, findings, and category breakdowns.
 
 ## How It Works
 
