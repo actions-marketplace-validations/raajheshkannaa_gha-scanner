@@ -22,7 +22,7 @@ export default function Home() {
           <span className="text-emerald-400">secure</span>?
         </h1>
         <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
-          Scan any public repository for 28 security checks across 8 categories.
+          Scan any public repository for 25 security checks across 8 categories.
           Get a detailed report with specific remediation steps. Free, instant, no sign-up required.
         </p>
       </div>
@@ -51,7 +51,7 @@ export default function Home() {
 
       {/* Trust indicators */}
       <div className="text-center text-sm text-slate-500">
-        <p>28 checks inspired by real attacks: tj-actions (2025), Trivy (2026), Shai Hulud, GhostAction</p>
+        <p>25 checks inspired by real attacks: tj-actions (2025), Trivy (2026), Shai Hulud, GhostAction</p>
         <p className="mt-1">No data stored. No sign-up. Open source scanner engine.</p>
       </div>
     </div>

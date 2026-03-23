@@ -1,5 +1,5 @@
 import pLimit from 'p-limit';
-import { parse as parseYaml } from 'yaml';
+import { parseWorkflowYaml } from '../scanner/parser';
 import type { RepoContext, WorkflowFile } from '../scanner/types';
 
 // ---------------------------------------------------------------------------
@@ -266,14 +266,8 @@ export async function fetchRepoContext(
       trackRate(rl);
       if (!content) return null;
 
-      let parsed: Record<string, unknown> | null = null;
-      try {
-        parsed = parseYaml(content) as Record<string, unknown>;
-      } catch {
-        parsed = null;
-      }
-
       const name = wfPath.split('/').pop() ?? wfPath;
+      const { parsed } = parseWorkflowYaml(content, name);
       return { path: wfPath, name, content, parsed };
     }),
   );
@@ -326,11 +320,8 @@ export async function fetchRepoContext(
 
   let dependabotConfig: Record<string, unknown> | null = null;
   if (dependabotRaw) {
-    try {
-      dependabotConfig = parseYaml(dependabotRaw) as Record<string, unknown>;
-    } catch {
-      dependabotConfig = null;
-    }
+    const { parsed } = parseWorkflowYaml(dependabotRaw, 'dependabot.yml');
+    dependabotConfig = parsed;
   }
 
   return {
