@@ -79,7 +79,7 @@ export default function ScanPage() {
     }
 
     lines.push('---');
-    lines.push('*Scanned with [DefensiveWorks](https://defensive.works) GitHub Actions Security Scanner*');
+    lines.push('*Scanned with [GHA Scanner](https://github.com/raajheshkannaa/gha-scanner)*');
     return lines.join('\n');
   }
 
