@@ -88,7 +88,6 @@ export const injectionChecks: CheckDefinition[] = [
         'github.event.pull_request.head.sha',
         'github.event.pull_request.merged',
         'github.event.pull_request.author_association',
-        'github.event.pull_request.head.repo.full_name',
         'github.event.number',
         'github.event.action',
         'github.event.sender.login',

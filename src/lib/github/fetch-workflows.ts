@@ -158,7 +158,7 @@ async function discoverWorkflowPaths(
   owner: string,
   repo: string,
   branch: string,
-): Promise<{ paths: string[]; rateLimit: RateLimitInfo }> {
+): Promise<{ paths: string[]; totalWorkflows: number; rateLimit: RateLimitInfo }> {
   // Try the recursive tree first
   const { body, rateLimit } = await githubFetch(
     `/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
@@ -172,23 +172,25 @@ async function discoverWorkflowPaths(
       `/repos/${owner}/${repo}/contents/.github/workflows`,
     );
     const items = fallback.body as Array<{ name: string; path: string; type: string }>;
-    const paths = items
+    const allPaths = items
       .filter((item) => item.type === 'file' && WORKFLOW_PATH_RE.test(item.path))
-      .map((item) => item.path)
-      .slice(0, MAX_WORKFLOWS);
-    return { paths, rateLimit: fallback.rateLimit };
+      .map((item) => item.path);
+    const paths = allPaths.slice(0, MAX_WORKFLOWS);
+    const totalWorkflows = allPaths.length;
+    return { paths, totalWorkflows, rateLimit: fallback.rateLimit };
   }
 
-  const paths = tree.tree
+  const allPaths = tree.tree
     .filter(
       (entry) =>
         entry.mode !== '120000' &&
         WORKFLOW_PATH_RE.test(entry.path),
     )
-    .map((entry) => entry.path)
-    .slice(0, MAX_WORKFLOWS);
+    .map((entry) => entry.path);
+  const paths = allPaths.slice(0, MAX_WORKFLOWS);
+  const totalWorkflows = allPaths.length;
 
-  return { paths, rateLimit };
+  return { paths, totalWorkflows, rateLimit };
 }
 
 // ---------------------------------------------------------------------------
@@ -252,7 +254,7 @@ export async function fetchRepoContext(
   const headSha = (branchData as { commit: { sha: string } }).commit.sha;
 
   // Step 2 -- discover workflow files
-  const { paths: workflowPaths, rateLimit: treeRate } =
+  const { paths: workflowPaths, totalWorkflows, rateLimit: treeRate } =
     await discoverWorkflowPaths(owner, repo, defaultBranch);
   trackRate(treeRate);
   guardRateLimit();
@@ -260,6 +262,12 @@ export async function fetchRepoContext(
   // Step 3 -- fetch workflow contents in parallel (concurrency: 5)
   const limit = pLimit(5);
   const parseWarnings: string[] = [];
+
+  if (totalWorkflows > workflowPaths.length) {
+    parseWarnings.push(
+      `Repository has ${totalWorkflows} workflow files but only ${workflowPaths.length} were scanned (cap: ${MAX_WORKFLOWS}). Results may be incomplete.`
+    );
+  }
 
   const workflowPromises = workflowPaths.map((wfPath) =>
     limit(async (): Promise<WorkflowFile | null> => {

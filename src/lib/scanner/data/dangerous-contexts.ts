@@ -19,6 +19,8 @@ export const DANGEROUS_CONTEXTS: string[] = [
   'github.event.discussion.title',
   'github.event.discussion.body',
   'github.head_ref',
+  'github.event.pull_request.head.ref',
+  'github.event.pull_request.head.repo.full_name',
   'github.event.workflow_dispatch.inputs.*',
 ];
 
