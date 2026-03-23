@@ -42,6 +42,7 @@ export interface RepoContext {
   defaultBranch: string;
   headSha: string;
   workflows: WorkflowFile[];
+  parseWarnings: string[];
   hasDependabot: boolean;
   dependabotConfig: Record<string, unknown> | null;
   hasCodeowners: boolean;

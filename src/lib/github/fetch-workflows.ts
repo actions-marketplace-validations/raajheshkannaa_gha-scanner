@@ -259,6 +259,7 @@ export async function fetchRepoContext(
 
   // Step 3 -- fetch workflow contents in parallel (concurrency: 5)
   const limit = pLimit(5);
+  const parseWarnings: string[] = [];
 
   const workflowPromises = workflowPaths.map((wfPath) =>
     limit(async (): Promise<WorkflowFile | null> => {
@@ -267,7 +268,8 @@ export async function fetchRepoContext(
       if (!content) return null;
 
       const name = wfPath.split('/').pop() ?? wfPath;
-      const { parsed } = parseWorkflowYaml(content, name);
+      const { parsed, error } = parseWorkflowYaml(content, name);
+      if (error) parseWarnings.push(error);
       return { path: wfPath, name, content, parsed };
     }),
   );
@@ -330,6 +332,7 @@ export async function fetchRepoContext(
     defaultBranch,
     headSha,
     workflows,
+    parseWarnings,
     hasDependabot: dependabotRaw !== null,
     dependabotConfig,
     hasCodeowners: codeownersRaw !== null,

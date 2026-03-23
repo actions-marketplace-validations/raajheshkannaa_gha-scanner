@@ -5,8 +5,9 @@ import { calculateScore } from './scoring';
 export function runScan(context: RepoContext): ScanResult {
   const startTime = Date.now();
   const findings: Finding[] = [];
-  const warnings: string[] = [];
+  const warnings: string[] = [...context.parseWarnings];
   let passingChecks = 0;
+  const hasParseFailures = context.workflows.some(w => w.parsed === null);
 
   if (context.workflows.length === 0) {
     warnings.push('No workflow files found in this repository. Score reflects the absence of workflows, not their security.');
@@ -41,7 +42,7 @@ export function runScan(context: RepoContext): ScanResult {
     findings,
     categories,
     workflowCount: context.workflows.length,
-    partial: false,
+    partial: hasParseFailures,
     warnings,
   };
 }

@@ -3,6 +3,19 @@ import { MUTABLE_REFS } from '../data/mutable-refs';
 import { KNOWN_VULNERABLE_ACTIONS } from '../data/known-vulnerable-actions';
 import { findLineNumber } from '../parser';
 
+/** Simple semver comparison: returns true if version a >= version b */
+function isVersionGte(a: string, b: string): boolean {
+  const pa = a.split('.').map(Number);
+  const pb = b.split('.').map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const na = pa[i] || 0;
+    const nb = pb[i] || 0;
+    if (na > nb) return true;
+    if (na < nb) return false;
+  }
+  return true; // equal
+}
+
 const SHA_PATTERN = /^[0-9a-f]{40}$/;
 
 interface StepUses {
@@ -199,6 +212,16 @@ export const supplyChainChecks: CheckDefinition[] = [
             (v) => v.action === parsed.action
           );
           if (!vuln) continue;
+
+          // Version-aware check: skip if user is on a fixed version
+          if (vuln.fixedVersion && parsed.ref) {
+            // If pinned to SHA, we can't determine version from ref alone, but SHA pin is safe practice
+            if (/^[0-9a-f]{40}$/i.test(parsed.ref)) continue;
+            // Simple semver comparison: extract major.minor.patch from ref like "v46.0.1" or "46.0.1"
+            const refVersion = parsed.ref.replace(/^v/, '');
+            const fixVersion = vuln.fixedVersion;
+            if (isVersionGte(refVersion, fixVersion)) continue;
+          }
 
           const cveLabel = vuln.cveId ? ` (${vuln.cveId})` : '';
 
