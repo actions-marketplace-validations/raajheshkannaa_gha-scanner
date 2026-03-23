@@ -1,5 +1,9 @@
 name: 'GHA Scanner'
-description: 'Scan GitHub Actions workflows for security vulnerabilities'
+description: 'Scan GitHub Actions workflows for security vulnerabilities. 25 checks across 8 categories including supply chain, injection, permissions, secrets exposure, and more.'
+author: 'Raajhesh Kannaa Chidambaram'
+branding:
+  icon: 'shield'
+  color: 'green'
 inputs:
   token:
     description: 'GitHub token for API access'
@@ -9,6 +13,15 @@ inputs:
     description: 'Fail the action if findings at this severity or above are found (critical, high, medium, low, none)'
     required: false
     default: 'high'
+outputs:
+  score:
+    description: 'Security score (0-100)'
+  grade:
+    description: 'Letter grade (A-F)'
+  findings:
+    description: 'Number of findings'
+  result:
+    description: 'Full scan result as JSON'
 runs:
   using: 'node20'
   main: 'dist/action.js'
