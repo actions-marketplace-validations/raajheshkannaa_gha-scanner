@@ -8873,23 +8873,24 @@ var runnerSecurityChecks = [
             category: "runner-security",
             title: `Self-hosted runner "${jobName}" exposed to pull_request trigger`,
             description: `Workflow "${workflow.name}" runs job "${jobName}" on a self-hosted runner with the \`pull_request\` trigger. Anyone who can open a pull request (including from forks on public repos) can execute arbitrary code on your self-hosted runner.`,
-            risk: "Self-hosted runners are persistent machines, unlike GitHub-hosted ephemeral runners. An attacker can fork the repo, modify the workflow to run malicious code, and open a PR. This grants them shell access to your infrastructure, access to cached credentials, network access to internal resources, and the ability to compromise other jobs that run on the same runner. This was a primary attack vector in the SolarWinds supply chain compromise methodology.",
-            remediation: `Use GitHub-hosted runners for pull_request workflows, or restrict self-hosted runners:
+            risk: 'Fork PRs execute attacker-controlled code on your self-hosted runner. This grants shell access to your infrastructure, cached credentials, and internal network. Demonstrated at scale against Google, Microsoft, TensorFlow, and PyTorch (DEF CON 32, Khan & Stawinski). GitHub docs: "Self-hosted runners should almost never be used for public repositories." Even with fork PR approval requirements, attackers bypass this via trust-building (submit harmless PRs first). Even ephemeral runners (ARC) are exploitable during the job execution window.',
+            remediation: `Use GitHub-hosted runners for pull_request workflows:
 
 \`\`\`yaml
-# Option 1: Use GitHub-hosted runners for PRs
 jobs:
   ${jobName}:
     runs-on: ubuntu-latest  # ephemeral, isolated
-
-# Option 2: Use environment protection rules
-jobs:
-  ${jobName}:
-    runs-on: self-hosted
-    environment: production  # requires approval for fork PRs
 \`\`\`
 
-For public repos, never use self-hosted runners with pull_request triggers.`,
+If self-hosted runners are required, layer these mitigations:
+1. Set "Require approval for all outside collaborators" in repo settings
+2. Use ephemeral runners (Actions Runner Controller) that destroy after each job
+3. Isolate runner network from internal resources
+4. Add runtime monitoring (e.g. StepSecurity Harden-Runner)
+5. Use environment protection rules with required reviewers
+
+If all mitigations are confirmed in place, suppress with:
+# gha-scanner-ignore: runner/self-hosted-pr`,
             file: workflow.path,
             line: findLineNumber(workflow.content, "self-hosted"),
             evidence
