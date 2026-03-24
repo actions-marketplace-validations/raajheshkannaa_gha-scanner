@@ -1,12 +1,30 @@
 # GHA Scanner
 
+[![CI](https://github.com/raajheshkannaa/gha-scanner/actions/workflows/ci.yml/badge.svg)](https://github.com/raajheshkannaa/gha-scanner/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 Static analysis for GitHub Actions workflows. Finds security misconfigurations, injection vulnerabilities, supply chain risks, and CI/CD hygiene issues.
 
 25 checks. 8 categories. Results in seconds.
 
+**[Try it now: scan.defensive.works](https://scan.defensive.works)**
+
+![GHA Scanner results page showing a graded security report with findings grouped by category](https://github.com/raajheshkannaa/gha-scanner/raw/main/docs/assets/screenshot.png)
+
+## Inspired by Real Attacks
+
+Every check maps to a real breach. This is not theoretical.
+
+| Attack | Year | What Happened | Checks That Catch It |
+|--------|------|---------------|---------------------|
+| [tj-actions/changed-files](https://github.com/advisories/ghsa-mrrh-fwg8-r2c3) | 2025 | Compromised action exfiltrated secrets from 23,000+ repos | `supply-chain/known-vulnerable`, `supply-chain/unpinned-actions` |
+| [Trivy supply chain](https://www.wiz.io/blog/trivy-compromised-teampcp-supply-chain-attack) | 2026 | 75 of 76 version tags poisoned after botched credential rotation | `supply-chain/mutable-refs`, `supply-chain/known-vulnerable` |
+| [Self-hosted runner exploitation](https://media.defcon.org/DEF%20CON%2032/) | 2024 | Google, Microsoft, PyTorch runners compromised via fork PRs | `runner/self-hosted-pr`, `runner/self-hosted-untrusted` |
+| [GhostAction campaign](https://blog.gitguardian.com/ghostaction-campaign-3-325-secrets-stolen/) | 2025 | 3,325 secrets stolen via workflow injection in 817 repos | `injection/dangerous-contexts`, `secrets/echoed-to-logs` |
+
 ## Get Started
 
-**Scan now:** [scan.defensive.works](https://scan.defensive.works)
+**Web UI:** [scan.defensive.works](https://scan.defensive.works). Paste any public repo, get a graded report.
 
 **GitHub Action:**
 ```yaml
@@ -28,6 +46,21 @@ curl -X POST https://scan.defensive.works/api/scan \
   -H "Content-Type: application/json" \
   -d '{"repo":"owner/repo"}'
 ```
+
+## How It Compares
+
+GHA Scanner is complementary to existing tools. Use actionlint for syntax, zizmor for deep workflow linting, GHA Scanner for security posture grading and CVE detection.
+
+| Capability | GHA Scanner | zizmor | actionlint | Scorecard |
+|------------|:-----------:|:------:|:----------:|:---------:|
+| Web UI (paste URL, get report) | Yes | No | No | No |
+| Version-aware CVE matching | Yes | Yes | No | No |
+| Security grading (A-F) | Yes | No | No | Yes |
+| Injection detection | Yes | Yes | Yes | No |
+| Inline suppression | Yes | Yes | Yes | No |
+| GitHub Action | Yes | Yes | Yes | Yes |
+| CLI | Yes | Yes | Yes | Yes |
+| Written in | TypeScript | Rust | Go | Go |
 
 ## What It Checks
 
@@ -51,10 +84,10 @@ Scan results for popular open-source repos (as of March 2026):
 | Repository | Grade | Findings | Notable |
 |------------|-------|----------|---------|
 | facebook/react | B (80) | 79 | Mostly unpinned actions |
-| vercel/next.js | D (68) | 103 | 4 critical, secrets in logs |
-| grafana/grafana | C (79) | 84 | Catches tj-actions CVE |
-| prometheus/prometheus | A (93) | 29 | Well-maintained |
-| messypoutine/gravy-overflow | C (70) | 24 | Deliberately vulnerable, 6 critical |
+| vercel/next.js | D (68) | 103 | 4 critical, secrets in logs, exposed self-hosted runners |
+| hashicorp/vault | D (69) | 183 | 27 critical, self-hosted runners on pull_request across 15 workflows |
+| grafana/grafana | C (79) | 84 | Catches tj-actions CVE-2025-30066 |
+| prometheus/prometheus | A (93) | 29 | Well-maintained workflow security |
 
 ## Features
 
@@ -62,7 +95,7 @@ Scan results for popular open-source repos (as of March 2026):
 - **Inline suppression.** `# gha-scanner-ignore: check-id` to suppress specific findings with audit trail.
 - **GitHub Action.** Add to your CI with configurable fail thresholds. Writes summary to PR checks.
 - **CLI with exit codes.** `0` clean, `1` critical/high found, `2` error. JSON and Markdown output modes.
-- **Rate limiting.** Optional Upstash Redis / Vercel KV integration for hosted deployments.
+- **No code execution.** Pure YAML parsing. No workflows triggered. No agents installed.
 
 ## More
 
