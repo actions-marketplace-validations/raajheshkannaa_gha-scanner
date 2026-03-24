@@ -40,6 +40,12 @@ cd gha-scanner && npm install && npm run build:cli
 GITHUB_TOKEN=ghp_xxx node dist/cli.js owner/repo
 ```
 
+**Claude Code skill:**
+```
+/gha-scan
+```
+Scans workflow files in your current project. Catches issues as you write them, before commit.
+
 **API:**
 ```bash
 curl -X POST https://scan.defensive.works/api/scan \
