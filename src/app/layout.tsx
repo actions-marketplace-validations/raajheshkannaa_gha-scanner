@@ -8,10 +8,25 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'GHA Scanner - GitHub Actions Security Scanner',
   description: 'Scan your GitHub Actions workflows for security vulnerabilities. Free, instant, and comprehensive.',
+  metadataBase: new URL('https://scan.defensive.works'),
   openGraph: {
     title: 'GHA Scanner - GitHub Actions Security Scanner',
     description: 'Is your GitHub Actions pipeline secure? Scan now.',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 627,
+        alt: 'GHA Scanner - 25 Security Checks for GitHub Actions',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'GHA Scanner - GitHub Actions Security Scanner',
+    description: 'Is your GitHub Actions pipeline secure? Scan now.',
+    images: ['/og-image.png'],
   },
 };
 
