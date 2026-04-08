@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </Link>
             <nav className="flex items-center gap-5 text-sm text-[#94a3b8]">
               <Link href="/scan" className="hover:text-[#22c55e] transition-colors">scan</Link>
-              <Link href="/blog" className="hover:text-[#22c55e] transition-colors">docs</Link>
+              <a href="https://docs.defensive.works" target="_blank" rel="noopener noreferrer" className="hover:text-[#22c55e] transition-colors">docs</a>
               <a href="https://github.com/raajheshkannaa/gha-scanner" target="_blank" rel="noopener noreferrer" className="hover:text-[#22c55e] transition-colors">github</a>
             </nav>
           </div>
