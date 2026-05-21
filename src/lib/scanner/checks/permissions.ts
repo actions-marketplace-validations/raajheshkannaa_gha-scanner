@@ -1,5 +1,6 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { findLineNumber } from '../parser';
+import { oidcOverscopeCheck } from './oidc-overscope';
 
 function getJobs(parsed: Record<string, unknown>): [string, Record<string, unknown>][] {
   const jobs = parsed['jobs'];
@@ -187,4 +188,6 @@ export const permissionsChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  oidcOverscopeCheck,
 ];
