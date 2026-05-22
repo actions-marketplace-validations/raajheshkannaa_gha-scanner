@@ -5,7 +5,7 @@
 
 Static analysis for GitHub Actions workflows. Finds security misconfigurations, injection vulnerabilities, supply chain risks, and CI/CD hygiene issues.
 
-25 checks. 8 categories. Results in seconds.
+27 checks. 8 categories. Results in seconds.
 
 **[Try it now: scan.defensive.works](https://scan.defensive.works)**
 
@@ -75,10 +75,10 @@ GHA Scanner is complementary to existing tools. Use actionlint for syntax, zizmo
 
 | Category | Checks | Key Findings |
 |----------|--------|--------------|
-| Supply Chain | 4 | Unpinned actions, mutable refs, known CVEs (tj-actions, Trivy), Docker tags |
+| Supply Chain | 5 | Unpinned actions, mutable refs, known CVEs (tj-actions, Trivy), Docker tags, cache poisoning (May 2026 TanStack pattern) |
 | Injection | 3 | Expression injection in run blocks, dangerous context variables |
 | Dangerous Triggers | 3 | `pull_request_target` + head checkout, secrets access, artifact poisoning |
-| Permissions | 3 | Missing permissions block, overly broad scope, no job-level overrides |
+| Permissions | 4 | Missing permissions block, overly broad scope, no job-level overrides, OIDC token issuance overscope |
 | Secrets Exposure | 4 | Secrets in logs, CLI arguments, credential persistence, artifact leakage |
 | Runner Security | 3 | Self-hosted + pull_request, untrusted triggers, Docker privilege escalation |
 | CI/CD Hygiene | 3 | Missing concurrency, timeouts, continue-on-error abuse |
