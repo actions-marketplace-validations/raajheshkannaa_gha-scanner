@@ -58,14 +58,24 @@ curl -X POST https://scan.defensive.works/api/scan \
 
 ## How It Compares
 
-GHA Scanner covers most of zizmor's default (non-pedantic) audit set in a pure-YAML engine, and adds A-F grading plus a paste-a-URL web UI. actionlint remains the best choice for workflow syntax linting.
+The one thing the other tools don't do: paste a public repo URL into [scan.defensive.works](https://scan.defensive.works) and get a graded **A-F security report in seconds**, no install, no token, no CI wiring. The grade is the product. It travels in a screenshot, a dashboard, or a "your repo scored a B" conversation that a raw findings list doesn't.
+
+Under that web grader, the check engine matches zizmor's default (non-pedantic) audit set, so the grade rests on real coverage instead of a thin subset. Treat that parity as table stakes. The grader above it is what makes this worth using over a CLI.
+
+Pick the tool that fits the job:
+
+- **GHA Scanner** for a fast, shareable posture grade on any public repo, or a security score in CI, with zero setup.
+- **zizmor** for the deepest static auditing inside your pipeline. It is Rust, faster, and ships online audits GHA Scanner does not (impostor commits, ref confusion, stale refs) plus richer template-injection analysis. If CI auditing is all you need, reach for it.
+- **actionlint** for workflow syntax and shell linting.
+- **Scorecard** for whole-repo OSS health beyond Actions.
 
 | Capability | GHA Scanner | zizmor | actionlint | Scorecard |
 |------------|:-----------:|:------:|:----------:|:---------:|
-| Web UI (paste URL, get report) | Yes | No | No | No |
-| Version-aware CVE matching | Yes | Yes | No | No |
-| Security grading (A-F) | Yes | No | No | Yes |
+| Web UI (paste URL, get graded report) | Yes | No | No | No |
+| Security grade (A-F) | Yes | No | No | Yes |
+| Runs with no install or token | Yes | No | No | No |
 | Injection detection | Yes | Yes | Yes | No |
+| Version-aware CVE matching | Yes | Yes | No | No |
 | Container/image pinning | Yes | Yes | No | No |
 | Typosquat / look-alike actions | Yes | Yes | No | No |
 | Trusted-publishing / OIDC checks | Yes | Yes | No | No |
