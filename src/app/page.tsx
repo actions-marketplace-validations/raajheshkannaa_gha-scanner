@@ -24,7 +24,7 @@ export default function Home() {
             Scan any public GitHub Actions repository for security vulnerabilities.
           </p>
           <p className="text-[#94a3b8] mt-1">
-            25 checks across 8 categories. Free, instant, no sign-up.
+            46 checks across 8 categories. Free, instant, no sign-up.
           </p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function Home() {
 
       {/* Trust indicators */}
       <div className="text-xs text-[#71717a]">
-        <p>25 checks inspired by real attacks: tj-actions (2025), Trivy (2026), Shai Hulud, GhostAction</p>
+        <p>46 checks inspired by real attacks: tj-actions (2025), Trivy (2026), Shai Hulud, GhostAction</p>
         <p className="mt-1">No data stored. No sign-up. Open source scanner engine.</p>
       </div>
     </div>

@@ -1,6 +1,9 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { DANGEROUS_CONTEXT_PATTERNS, DANGEROUS_CONTEXTS } from '../data/dangerous-contexts';
 import { findLineNumber } from '../parser';
+import { githubEnvCheck } from './github-env';
+import { insecureCommandsCheck } from './insecure-commands';
+import { githubScriptInjectionCheck } from './github-script-injection';
 
 /** Expressions referencing github.event.* inside ${{ }} */
 const EVENT_EXPRESSION_PATTERN = /\$\{\{[^}]*github\.event\.[^}]*\}\}/g;
@@ -231,4 +234,8 @@ export const injectionChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  githubEnvCheck,
+  insecureCommandsCheck,
+  githubScriptInjectionCheck,
 ];

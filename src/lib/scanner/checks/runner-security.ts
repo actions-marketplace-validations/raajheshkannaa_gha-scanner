@@ -1,5 +1,6 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { findLineNumber } from '../parser';
+import { hardcodedContainerCredentialsCheck } from './hardcoded-container-credentials';
 
 function execAll(pattern: RegExp, text: string): RegExpExecArray[] {
   const results: RegExpExecArray[] = [];
@@ -255,4 +256,6 @@ export const runnerSecurityChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  hardcodedContainerCredentialsCheck,
 ];

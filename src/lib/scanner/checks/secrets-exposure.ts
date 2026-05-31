@@ -1,6 +1,10 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { findLineNumber } from '../parser';
 import { SENSITIVE_FILE_PATTERNS } from '../data/sensitive-file-patterns';
+import { secretsInheritCheck } from './secrets-inherit';
+import { overprovisionedSecretsCheck } from './overprovisioned-secrets';
+import { unredactedSecretsCheck } from './unredacted-secrets';
+import { debugExposureCheck } from './debug-exposure';
 
 function execAll(pattern: RegExp, text: string): RegExpExecArray[] {
   const results: RegExpExecArray[] = [];
@@ -302,4 +306,9 @@ export const secretsExposureChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  secretsInheritCheck,
+  overprovisionedSecretsCheck,
+  unredactedSecretsCheck,
+  debugExposureCheck,
 ];
