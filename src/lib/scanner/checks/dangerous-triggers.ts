@@ -1,5 +1,9 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { findLineNumber } from '../parser';
+import { botConditionsCheck } from './bot-conditions';
+import { unsoundConditionCheck } from './unsound-condition';
+import { unsoundContainsCheck } from './unsound-contains';
+import { confusedDeputyAutomergeCheck } from './confused-deputy-automerge';
 
 function getTriggers(parsed: Record<string, unknown>): string[] {
   const on = parsed['on'] ?? parsed['true'];
@@ -226,4 +230,9 @@ export const dangerousTriggersChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  botConditionsCheck,
+  unsoundConditionCheck,
+  unsoundContainsCheck,
+  confusedDeputyAutomergeCheck,
 ];

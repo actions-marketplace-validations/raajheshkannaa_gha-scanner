@@ -2,6 +2,12 @@ import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { MUTABLE_REFS } from '../data/mutable-refs';
 import { KNOWN_VULNERABLE_ACTIONS } from '../data/known-vulnerable-actions';
 import { findLineNumber } from '../parser';
+import { cachePoisoningCheck } from './cache-poisoning';
+import { unpinnedContainerImagesCheck } from './unpinned-container-images';
+import { dependabotExecutionCheck } from './dependabot-execution';
+import { unverifiedRemoteExecCheck } from './unverified-remote-exec';
+import { typosquatUsesCheck } from './typosquat-uses';
+import { unpinnedToolsCheck } from './unpinned-tools';
 
 /** Simple semver comparison: returns true if version a >= version b */
 function isVersionGte(a: string, b: string): boolean {
@@ -311,4 +317,11 @@ export const supplyChainChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  cachePoisoningCheck,
+  unpinnedContainerImagesCheck,
+  dependabotExecutionCheck,
+  unverifiedRemoteExecCheck,
+  typosquatUsesCheck,
+  unpinnedToolsCheck,
 ];

@@ -5,7 +5,7 @@
 
 Static analysis for GitHub Actions workflows. Finds security misconfigurations, injection vulnerabilities, supply chain risks, and CI/CD hygiene issues.
 
-25 checks. 8 categories. Results in seconds.
+46 checks. 8 categories. Results in seconds.
 
 **[Try it now: scan.defensive.works](https://scan.defensive.works)**
 
@@ -58,14 +58,28 @@ curl -X POST https://scan.defensive.works/api/scan \
 
 ## How It Compares
 
-GHA Scanner is complementary to existing tools. Use actionlint for syntax, zizmor for deep workflow linting, GHA Scanner for security posture grading and CVE detection.
+The one thing the other tools don't do: paste a public repo URL into [scan.defensive.works](https://scan.defensive.works) and get a graded **A-F security report in seconds**, no install, no token, no CI wiring. The grade is the product. It travels in a screenshot, a dashboard, or a "your repo scored a B" conversation that a raw findings list doesn't.
+
+Under that web grader, the check engine matches zizmor's default (non-pedantic) audit set, so the grade rests on real coverage instead of a thin subset. Treat that parity as table stakes. The grader above it is what makes this worth using over a CLI.
+
+Pick the tool that fits the job:
+
+- **GHA Scanner** for a fast, shareable posture grade on any public repo, or a security score in CI, with zero setup.
+- **zizmor** for the deepest static auditing inside your pipeline. It is Rust, faster, and ships online audits GHA Scanner does not (impostor commits, ref confusion, stale refs) plus richer template-injection analysis. If CI auditing is all you need, reach for it.
+- **actionlint** for workflow syntax and shell linting.
+- **Scorecard** for whole-repo OSS health beyond Actions.
 
 | Capability | GHA Scanner | zizmor | actionlint | Scorecard |
 |------------|:-----------:|:------:|:----------:|:---------:|
-| Web UI (paste URL, get report) | Yes | No | No | No |
-| Version-aware CVE matching | Yes | Yes | No | No |
-| Security grading (A-F) | Yes | No | No | Yes |
+| Web UI (paste URL, get graded report) | Yes | No | No | No |
+| Security grade (A-F) | Yes | No | No | Yes |
+| Runs with no install or token | Yes | No | No | No |
 | Injection detection | Yes | Yes | Yes | No |
+| Version-aware CVE matching | Yes | Yes | No | No |
+| Container/image pinning | Yes | Yes | No | No |
+| Typosquat / look-alike actions | Yes | Yes | No | No |
+| Trusted-publishing / OIDC checks | Yes | Yes | No | No |
+| Online ref resolution (impostor commits, stale refs) | No | Yes | No | No |
 | Inline suppression | Yes | Yes | Yes | No |
 | GitHub Action | Yes | Yes | Yes | Yes |
 | CLI | Yes | Yes | Yes | Yes |
@@ -75,12 +89,12 @@ GHA Scanner is complementary to existing tools. Use actionlint for syntax, zizmo
 
 | Category | Checks | Key Findings |
 |----------|--------|--------------|
-| Supply Chain | 4 | Unpinned actions, mutable refs, known CVEs (tj-actions, Trivy), Docker tags |
-| Injection | 3 | Expression injection in run blocks, dangerous context variables |
-| Dangerous Triggers | 3 | `pull_request_target` + head checkout, secrets access, artifact poisoning |
-| Permissions | 3 | Missing permissions block, overly broad scope, no job-level overrides |
-| Secrets Exposure | 4 | Secrets in logs, CLI arguments, credential persistence, artifact leakage |
-| Runner Security | 3 | Self-hosted + pull_request, untrusted triggers, Docker privilege escalation |
+| Supply Chain | 10 | Unpinned actions, mutable refs, known CVEs (tj-actions, Trivy), Docker/container image tags, cache poisoning, typosquatted actions, `curl \| bash`, unpinned tool versions, Dependabot code execution |
+| Injection | 6 | Expression injection in run blocks, dangerous context variables, `GITHUB_ENV`/`GITHUB_PATH` injection, insecure-commands opt-in, github-script JS injection |
+| Dangerous Triggers | 7 | `pull_request_target` + head checkout, secrets access, artifact poisoning, spoofable bot conditions, always-true `if:`, unsound `contains()`, bot-gated auto-merge |
+| Permissions | 6 | Missing/overly-broad permissions, no job-level overrides, OIDC overscope, over-scoped GitHub App tokens, trusted-publishing nudge |
+| Secrets Exposure | 8 | Secrets in logs, CLI arguments, credential persistence, artifact leakage, `secrets: inherit`, `toJSON(secrets)`, `fromJSON(secrets)` redaction bypass, tmate/debug exposure |
+| Runner Security | 4 | Self-hosted + pull_request, untrusted triggers, Docker privilege escalation, hardcoded container credentials |
 | CI/CD Hygiene | 3 | Missing concurrency, timeouts, continue-on-error abuse |
 | Best Practices | 2 | Dependabot for Actions, CODEOWNERS for workflows |
 

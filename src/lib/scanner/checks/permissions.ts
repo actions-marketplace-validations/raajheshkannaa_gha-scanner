@@ -1,5 +1,8 @@
 import type { CheckDefinition, Finding, RepoContext } from '../types';
 import { findLineNumber } from '../parser';
+import { oidcOverscopeCheck } from './oidc-overscope';
+import { githubAppTokenCheck } from './github-app';
+import { useTrustedPublishingCheck } from './use-trusted-publishing';
 
 function getJobs(parsed: Record<string, unknown>): [string, Record<string, unknown>][] {
   const jobs = parsed['jobs'];
@@ -187,4 +190,8 @@ export const permissionsChecks: CheckDefinition[] = [
       return findings;
     },
   },
+
+  oidcOverscopeCheck,
+  githubAppTokenCheck,
+  useTrustedPublishingCheck,
 ];

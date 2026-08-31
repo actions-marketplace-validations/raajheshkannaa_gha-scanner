@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {'─'.repeat(60)}
             </div>
             <div className="flex items-center justify-between text-xs text-[#71717a]">
-              <span>25 checks across 8 categories</span>
+              <span>46 checks across 8 categories</span>
               <span>
                 by{' '}
                 <a href="https://raajhe.sh" target="_blank" rel="noopener noreferrer" className="text-[#94a3b8] hover:text-[#22c55e] transition-colors">
